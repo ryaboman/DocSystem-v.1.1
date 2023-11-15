@@ -1,0 +1,14 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdatePerformer`(id VARCHAR(45), PCName VARCHAR(45), surnameIN VARCHAR(45), nameIN VARCHAR(45), patronymicIN VARCHAR(45), departmentIN VARCHAR(45), postIN VARCHAR(100), phoneIN VARCHAR(45))
+    SQL SECURITY INVOKER
+BEGIN
+
+    UPDATE performer
+    SET user_name = PCName,
+		surname = surnameIN,
+        name = nameIN,
+        patronymic = patronymicIN,
+        department = departmentIN,
+        post = postIN,
+        number_phone = phoneIN        
+	WHERE id_user = id;
+END

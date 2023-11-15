@@ -1,0 +1,12 @@
+CREATE TABLE `performer` (
+  `id_user` int(11) NOT NULL AUTO_INCREMENT,
+  `user_name` varchar(45) NOT NULL COMMENT 'Имя компьютера пользователя',
+  `surname` varchar(45) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `patronymic` varchar(45) NOT NULL,
+  `department` varchar(45) NOT NULL,
+  `post` varchar(100) DEFAULT NULL,
+  `number_phone` varchar(45) NOT NULL,
+  PRIMARY KEY (`id_user`),
+  UNIQUE KEY `user_name_UNIQUE` (`user_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=cp1251 COMMENT='Таблица пользователей SN-системой'

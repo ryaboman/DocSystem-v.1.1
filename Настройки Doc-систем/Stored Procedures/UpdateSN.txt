@@ -1,0 +1,16 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateSN`(numberSN VARCHAR(45), nameSN VARCHAR(100), destinationSN VARCHAR(10), textSN VARCHAR(256), performerSN VARCHAR(10), pathSN VARCHAR(200), markSN VARCHAR(45), dateDoc VARCHAR(45))
+    SQL SECURITY INVOKER
+BEGIN
+	DECLARE today DATE;
+	SELECT CURDATE() INTO today;
+    
+	UPDATE service_note
+    SET name_sn = nameSN,
+        destination = destinationSN,
+        user = performerSN,
+        date = dateDoc,
+        summary = textSN,
+        path = pathSN,
+        number_sn = markSN
+	WHERE count_sn = numberSN; 
+END

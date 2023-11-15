@@ -1,0 +1,9 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AddDestination`(surname VARCHAR(45), destName VARCHAR(45), destPatronymic VARCHAR(45), destPost VARCHAR(70), genitivePost VARCHAR(100))
+    SQL SECURITY INVOKER
+BEGIN
+	DECLARE today DATE;
+	SELECT CURDATE() INTO today;
+    
+	INSERT INTO destination (dest_surname, dest_name, dest_patronymic, emp_position, genitive_dest, date_dest)
+	VALUES (surname, destName, destPatronymic, destPost, genitivePost,  today); 
+END

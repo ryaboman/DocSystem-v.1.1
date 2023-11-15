@@ -1,0 +1,6 @@
+CREATE TABLE `variable` (
+  `id_variable` int(11) NOT NULL AUTO_INCREMENT,
+  `var_name` varchar(45) DEFAULT NULL,
+  `value` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id_variable`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=cp1251 COMMENT='Переменные'

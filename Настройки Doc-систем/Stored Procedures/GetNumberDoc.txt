@@ -1,0 +1,48 @@
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GetNumberDoc`(out count_sn_out INT)
+    SQL SECURITY INVOKER
+BEGIN
+	DECLARE count_id INT;    
+    DECLARE today DATE;
+	#Если flag = true то полученный номер записываем в БД (flag bool) Нужно?
+    
+    #начнем транзакцию
+	START TRANSACTION;
+    SET AUTOCOMMIT=0;
+    
+	SELECT COUNT(*) INTO count_id
+    FROM deleted_sn;
+    If (count_id) THEN
+		SELECT count_sn INTO count_sn_out
+        FROM deleted_sn
+        ORDER BY count_sn
+        LIMIT 1;
+              
+        SELECT CURDATE() INTO today; 
+        
+        INSERT INTO service_note (count_sn, number_sn, name_sn, destination, user, date)
+		VALUES (count_sn_out, count_sn_out, "Документ", 1, null,  today); 
+                    
+        DELETE FROM deleted_sn WHERE count_sn = count_sn_out;
+        
+	ELSE
+		BEGIN
+			SELECT count_sn INTO count_sn_out 
+			FROM service_note
+			ORDER BY count_sn DESC  #Возможно здесь нужно не с помощью сортировки. А как?? Может с помощью курсоров
+			LIMIT 1;
+            
+			SELECT count_sn_out + 1 INTO count_sn_out;
+            
+            SELECT CURDATE() INTO today;
+            
+            INSERT INTO service_note (count_sn, service_note.number_sn, name_sn, destination, user, date)
+			VALUES (count_sn_out, count_sn_out, "Документ", 1, null,  today); 
+		END;
+	END IF;	
+            
+    #При этом нужно сделать запись в таблицу со СЗ
+
+	COMMIT;
+    SET AUTOCOMMIT=1;
+      
+END
