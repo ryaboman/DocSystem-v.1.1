@@ -41,12 +41,6 @@ namespace MainWindow
                     comboBoxPerformer.Text = serviceNote.performer.InitialsPhone();
                     destList = conn.GetAllDestination(comboBoxDestin);
                     conn.Disconnect();
-
-                    comboBoxPerformer.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxPerformer.AutoCompleteSource = AutoCompleteSource.ListItems;
-
-                    comboBoxDestin.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxDestin.AutoCompleteSource = AutoCompleteSource.ListItems;
                 }
                 else
                 {
@@ -99,13 +93,12 @@ namespace MainWindow
                         }
                         
 
-                        Performer perform = serviceNote.performer;
+                        Performer perform = serviceNote.performer;                        
 
-                        string department = perform.department;
 
                         string numberSN = conn.GetNumberDoc().ToString();  //Номер служебной записки
 
-                        string markSN = "195-95-30-" + department + "-" + numberSN;
+                        string markSN = "195-95-30-3631-" + numberSN;
 
                         //Нужно копировать номер СЗ в буфер обмена
                         Clipboard.SetDataObject(markSN, true);
@@ -124,9 +117,9 @@ namespace MainWindow
                         serviceNote.mark = markSN;
                         serviceNote.date = DateTime.Today;
 
-                        string fullFileName = Path.Combine(pathDirectory, nameFile); //полный путь к файлу                                    
+                        string fullFileName = Path.Combine(pathDirectory, nameFile); //полный путь к файлу            
 
-                        //Работаем с Word
+
                         MessageFilter.Register();
 
                         //создадим 
@@ -147,6 +140,8 @@ namespace MainWindow
                         MessageFilter.Revoke();
 
                         conn.UpdateSN(serviceNote);
+
+                        conn.LastNNumberSN(10);
 
                         //Закрываем соединение с БД
                         conn.Disconnect();

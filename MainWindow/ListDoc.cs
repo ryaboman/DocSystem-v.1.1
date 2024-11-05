@@ -13,9 +13,6 @@ namespace MainWindow
 {
     public partial class ListDoc : Form
     {
-
-        public string department = null;
-
         public ListDoc()
         {
             InitializeComponent();
@@ -35,11 +32,6 @@ namespace MainWindow
 
                 if (conn.Connect())
                 {
-                    if(department == null)
-                    {
-                        department = conn.GetPerformer().department;
-                    }
-
                     string DateFrom = dateTimeFrom.Value.Date.Year.ToString() + "-" +
                                       dateTimeFrom.Value.Date.Month.ToString() + "-" +
                                       dateTimeFrom.Value.Date.Day.ToString();
@@ -48,7 +40,7 @@ namespace MainWindow
                                     dateTimeBy.Value.Date.Month.ToString() + "-" +
                                     dateTimeBy.Value.Date.Day.ToString();
 
-                    string sqlDate = " WHERE date >= \"" + DateFrom + "\" AND date <= \"" + DateBy + "\"" + department + " ORDER BY count_sn DESC;";
+                    string sqlDate = " WHERE date >= \"" + DateFrom + "\" AND date <= \"" + DateBy + "\"  ORDER BY count_sn DESC;";
 
                     List<SNClass> listDoc = conn.SerchDoc(sqlDate);
 

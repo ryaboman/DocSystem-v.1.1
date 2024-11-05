@@ -77,7 +77,6 @@ namespace MainWindow
         public string department { get; set; }        
         public string post { get; set; }
         public string phone { get; set; }
-        public bool IsUserRoot { get; set; }
 
         public Performer()
         {
@@ -86,10 +85,9 @@ namespace MainWindow
             surname = null;
             name = null;
             patronymic = null;
-            department = "0";
+            department = null;
             post = null;
             phone = null;
-            IsUserRoot = false;
         }
 
         public string InitialsPhone()

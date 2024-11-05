@@ -48,23 +48,20 @@ namespace MainWindow
             //будем создавать документы
             try
             {
-                if(treeViewFileConduc.SelectedNode != null)
-                {
-                    //Если файл, то открываем
-                    string pathFile = treeViewFileConduc.SelectedNode.Tag.ToString();
+                //Если файл, то открываем
+                string pathFile = treeViewFileConduc.SelectedNode.Tag.ToString();
 
-                    if (new CommonClass().IsFile(pathFile))
-                    {
-                        pathPattern = pathFile;
-                        this.DialogResult = DialogResult.OK;
-                        this.Close();
-                    }
-                }                           
+                if (new CommonClass().IsFile(pathFile))
+                {
+                    pathPattern = pathFile;                  
+
+                    this.Close();
+                }                
+
             }
             catch
             {
                 MessageBox.Show("Исключение");
-                this.DialogResult = DialogResult.Cancel;
                 this.Close();
             }
             

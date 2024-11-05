@@ -44,7 +44,6 @@
             // 
             // butCancel
             // 
-            this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.butCancel.Location = new System.Drawing.Point(12, 221);
             this.butCancel.Name = "butCancel";
             this.butCancel.Size = new System.Drawing.Size(75, 23);
@@ -66,14 +65,13 @@
             // treeViewFileConduc
             // 
             this.treeViewFileConduc.ContextMenuStrip = this.contextMenuStrip;
-            this.treeViewFileConduc.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeViewFileConduc.ImageIndex = 0;
             this.treeViewFileConduc.ImageList = this.imageList;
             this.treeViewFileConduc.LabelEdit = true;
-            this.treeViewFileConduc.Location = new System.Drawing.Point(0, 0);
+            this.treeViewFileConduc.Location = new System.Drawing.Point(12, 13);
             this.treeViewFileConduc.Name = "treeViewFileConduc";
             this.treeViewFileConduc.SelectedImageIndex = 0;
-            this.treeViewFileConduc.Size = new System.Drawing.Size(284, 255);
+            this.treeViewFileConduc.Size = new System.Drawing.Size(260, 196);
             this.treeViewFileConduc.TabIndex = 3;
             this.treeViewFileConduc.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeViewFileConduc_AfterLabelEdit);
             this.treeViewFileConduc.DoubleClick += new System.EventHandler(this.butCreate_Click);
@@ -136,7 +134,7 @@
             this.Controls.Add(this.butCancel);
             this.KeyPreview = true;
             this.MaximizeBox = false;
-            this.MaximumSize = new System.Drawing.Size(600, 600);
+            this.MaximumSize = new System.Drawing.Size(300, 294);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(300, 294);
             this.Name = "CreateDocFromPattern";

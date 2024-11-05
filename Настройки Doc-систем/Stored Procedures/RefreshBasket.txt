@@ -1,5 +1,0 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `RefreshBasket`()
-    SQL SECURITY INVOKER
-BEGIN
-	TRUNCATE TABLE deleted_sn;
-END

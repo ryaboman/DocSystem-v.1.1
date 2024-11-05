@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0-oraclelinux8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: R7008T 
+      MYSQL_DATABASE: sn_system
+      MYSQL_USER: ironman
+      MYSQL_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    volumes: 
+      - ./db/init_table.sql:/docker-entrypoint-initdb.d/init_table.sql
+      - ./db/init_stored_procedures.sql:/docker-entrypoint-initdb.d/init_stored_procedures.sql
+volumes:
+  mysql_data:

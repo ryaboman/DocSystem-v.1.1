@@ -1,8 +1,0 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `DeleteSN`(id VARCHAR(45), numberSN VARCHAR(45))
-    SQL SECURITY INVOKER
-BEGIN
-	INSERT INTO deleted_sn (count_sn) 
-    VALUES (numberSN);
-    
-    DELETE FROM service_note WHERE id_sn = id;
-END

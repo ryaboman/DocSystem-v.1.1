@@ -42,10 +42,10 @@ namespace MainWindow
         public bool Connect()  //функция подключения к базе данных 
         {
 
-            string connStr = "server = " + server + "; " +   
-                             "user = " + user + "; " + 
+            string connStr = "server = " + server + "; " +
+                             "user = " + user + "; " +
                              "database = " + database + "; " +
-                             "password = " + password;
+                             "password = " + password + "; ";
 
             conn = new MySqlConnection(connStr);
 
@@ -76,14 +76,6 @@ namespace MainWindow
             number_sn.Value = 0;
             number_sn.Direction = ParameterDirection.Output;
             command.Parameters.Add(number_sn);
-
-            //Параметр - номер (обозначение) СЗ
-            MySqlParameter depart = new MySqlParameter();
-            depart.ParameterName = "depart"; //наименование параметра в БД
-            depart.MySqlDbType = MySqlDbType.VarChar;
-            depart.Value = GetPerformer().department;
-            depart.Direction = ParameterDirection.Input;
-            command.Parameters.Add(depart);
 
             try
             {
@@ -283,7 +275,7 @@ namespace MainWindow
             //может необходимо создавать прям запрос???
             //Здесь будем получать всех адресатов, для выпадающего меню
 
-            string sql = "SELECT id_user, user_name, surname, name, patronymic, department, post, number_phone, IsUserRoot FROM performer ORDER BY surname";
+            string sql = "SELECT id_user, user_name, surname, name, patronymic, department, post, number_phone FROM performer ORDER BY surname";
 
             List <Performer> performList = new List<Performer>();
 
@@ -296,25 +288,20 @@ namespace MainWindow
 
                 while (reader.Read())
                 {
-                    Performer per = new Performer();
+                    Performer performer = new Performer();
 
-                    per.id = reader[0].ToString();    //id
-                    per.PCName = reader[1].ToString();     //Учетная запись на компьютере
-                    per.surname = reader[2].ToString();      //Фамилия
-                    per.name = reader[3].ToString();         //Имя
-                    per.patronymic = reader[4].ToString();   //Отчество                
-                    per.department = reader[5].ToString();
-                    per.post = reader[6].ToString();      // Должность
-                    per.phone = reader[7].ToString();
+                    performer.id = reader[0].ToString();    //id
+                    performer.PCName = reader[1].ToString();     //Учетная запись на компьютере
+                    performer.surname = reader[2].ToString();      //Фамилия
+                    performer.name = reader[3].ToString();         //Имя
+                    performer.patronymic = reader[4].ToString();   //Отчество                
+                    performer.department = reader[5].ToString();
+                    performer.post = reader[6].ToString();      // Должность
+                    performer.phone = reader[7].ToString();
+                    
+                    comboBoxPerform.Items.Add(performer.Initials());  //Получить "Фамилия И.О. должность"
 
-                    if (Int32.Parse(reader[8].ToString()) == 1)
-                    {
-                        per.IsUserRoot = true;            // исполнитель имеет права рут??
-                    }
-
-                    comboBoxPerform.Items.Add(per.Initials());  //Получить "Фамилия И.О. должность"
-
-                    performList.Add(per);
+                    performList.Add(performer);
                 }
                 reader.Close();
             }
@@ -366,7 +353,7 @@ namespace MainWindow
         {
             Performer per = new Performer();
 
-            string sql = "SELECT id_user, user_name, surname, name, patronymic, department, number_phone, post, IsUserRoot FROM performer WHERE user_name = ";
+            string sql = "SELECT id_user, user_name, surname, name, patronymic, department, number_phone, post FROM performer WHERE user_name = ";
 
             sql += '\"' + Environment.UserName + '\"';
 
@@ -387,10 +374,6 @@ namespace MainWindow
                     per.phone = reader[6].ToString();            // телефон исполнителя
                     per.post = reader[7].ToString();            // должность исполнителя
 
-                    if (Int32.Parse(reader[8].ToString()) == 1)
-                    {
-                        per.IsUserRoot = true;            // исполнитель имеет права рут??
-                    }                    
                 }
                 reader.Close();
             }
@@ -406,7 +389,7 @@ namespace MainWindow
         {
             Performer per = new Performer();
 
-            string sql = "SELECT id_user, user_name, surname, name, patronymic, department, number_phone, post, IsUserRoot  FROM performer WHERE id_user = 0"; //0 нужен для того чтобы ошибки не было
+            string sql = "SELECT id_user, user_name, surname, name, patronymic, department, number_phone FROM performer WHERE id_user = 0"; //0 нужен для того чтобы ошибки не было
 
             sql += id + ";";
 
@@ -427,12 +410,7 @@ namespace MainWindow
                     per.patronymic = reader[4].ToString();       // Отчество исполнителя
                     per.department = reader[5].ToString();       // КГ исполнителя
                     per.phone = reader[6].ToString();            // телефон исполнителя
-                    per.post = reader[7].ToString();            // должность исполнителя
-
-                    if (Int32.Parse(reader[8].ToString()) == 1)
-                    {
-                        per.IsUserRoot = true;            // исполнитель имеет права рут??
-                    }
+                    //per.post ???
                 }
                 reader.Close();
             }
@@ -521,13 +499,6 @@ namespace MainWindow
             dateDoc.Value = date;
             dateDoc.Direction = ParameterDirection.Input;
             command.Parameters.Add(dateDoc);
-
-            MySqlParameter depart = new MySqlParameter();
-            depart.ParameterName = "depart";
-            depart.MySqlDbType = MySqlDbType.VarChar;
-            depart.Value = serviceNote.performer.department;
-            depart.Direction = ParameterDirection.Input;
-            command.Parameters.Add(depart);
 
 
             try
@@ -860,15 +831,13 @@ namespace MainWindow
         }
 
         //N-последних служебных записок //Выводятся при открытии программы //Кроме удаленных
-        public List<SNClass> LastNNumberSN(int N, string strSQL)
+        public List<SNClass> LastNNumberSN(int N)
         {
             List<SNClass> listDoc = new List<SNClass>();
 
-            string sql = "SELECT id_sn, count_sn, number_sn, name_sn, destination, user, date, summary, path FROM service_note WHERE id_sn > 0";
+            string sql = "SELECT id_sn, count_sn, number_sn, name_sn, destination, user, date, summary, path FROM service_note ORDER BY count_sn DESC LIMIT ";
 
-            sql += strSQL;
-
-            sql += "ORDER BY count_sn DESC LIMIT " + N.ToString() + ";";
+            sql += N.ToString() + ";";
 
             MySqlCommand command = new MySqlCommand(sql, conn);
 
@@ -921,15 +890,16 @@ namespace MainWindow
 
         public string GetVariable(string varName)
         {
-            string sql = "SELECT value FROM variable WHERE var_name = ";
-            sql += "\"" + varName + "\";";
+            string sql = "SELECT value FROM sn_system.variable WHERE var_name = ";
+            sql += "'" + varName + "';";
 
-            string value = string.Empty;
 
-            MySqlCommand command = new MySqlCommand(sql, conn);            
 
+            MySqlCommand command = new MySqlCommand(sql, conn);
+            
             try
             {
+                string value = string.Empty;
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -939,8 +909,7 @@ namespace MainWindow
 
                 return value;
             }
-            catch
-            {
+            catch (Exception e) {
                 return string.Empty;
             }
         }
@@ -964,7 +933,7 @@ namespace MainWindow
             }
         }
         
-        public string SetNumberDoc(string numberDoc, Performer performer)
+        public string SetNumberDoc(string numberDoc)
         {
             MySqlCommand command = new MySqlCommand("SetNumberDoc;", conn);
 
@@ -987,14 +956,6 @@ namespace MainWindow
             id_doc.Direction = ParameterDirection.Output;
             command.Parameters.Add(id_doc);
 
-            //Параметр - номер выходной
-            MySqlParameter depart = new MySqlParameter();
-            depart.ParameterName = "depart"; //наименование параметра в БД
-            depart.MySqlDbType = MySqlDbType.VarChar;
-            depart.Value = "'" + performer.department + "'";
-            depart.Direction = ParameterDirection.Input;
-            command.Parameters.Add(depart);
-
             try
             {
                 command.ExecuteNonQuery();
@@ -1012,7 +973,24 @@ namespace MainWindow
                 return null;
             }                        
         }
-       
+
+        public void RefreshBasket()
+        {
+            MySqlCommand command = new MySqlCommand("RefreshBasket;", conn);
+
+            // Настроить вид у Command как StoredProcedure.            
+            command.CommandType = CommandType.StoredProcedure;
+
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch
+            {
+
+            }
+
+        }
 
     }
 }

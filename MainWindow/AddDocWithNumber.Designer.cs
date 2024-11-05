@@ -69,7 +69,6 @@
             // 
             // comboBoxPerformer
             // 
-            this.comboBoxPerformer.Enabled = false;
             this.comboBoxPerformer.FormattingEnabled = true;
             this.comboBoxPerformer.Location = new System.Drawing.Point(8, 217);
             this.comboBoxPerformer.Name = "comboBoxPerformer";
@@ -171,7 +170,6 @@
             // 
             // comboBoxDestin
             // 
-            this.comboBoxDestin.DropDownWidth = 300;
             this.comboBoxDestin.FormattingEnabled = true;
             this.comboBoxDestin.Location = new System.Drawing.Point(8, 72);
             this.comboBoxDestin.Name = "comboBoxDestin";

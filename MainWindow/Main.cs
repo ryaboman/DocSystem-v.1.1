@@ -24,12 +24,6 @@ namespace MainWindow
 
         public WorkMySQL conn = null;
 
-        Performer currentUser = null;
-
-        string department = null;
-
-
-
         public Main()
         {
             InitializeComponent(); //А если pdf или word не установлем
@@ -44,51 +38,17 @@ namespace MainWindow
 
                 if (conn.Connect())
                 {
-
-                    comboBoxPerform.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxPerform.AutoCompleteSource = AutoCompleteSource.ListItems;
-
-                    comboBoxDest.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxDest.AutoCompleteSource = AutoCompleteSource.ListItems;
-
-                    pathHead = conn.GetVariable("pathHead"); //головная часть пути                     
-
-                    currentUser = conn.GetPerformer();
-                    department = " AND department = '" + currentUser.department + "'";
-
-                    if (currentUser.IsUserRoot)
-                    {
-                        //department = "";
-                        StripMenuItemDeleteSN.Enabled = true;
-
-                        //Меню добавления исполнителя
-                        MenuItemPerformer.Enabled = true;
-
-                        CreateDoc.Enabled = true;
-                    }
-
-                    listDoc = conn.LastNNumberSN(55, department);
+                    listDoc = conn.LastNNumberSN(10);
                     AddListBox();
+                    pathHead = conn.GetVariable("pathHead"); //головная часть пути 
+                    conn.Disconnect();
 
-                    switch (currentUser.department)
+                    if (Environment.UserName == "Aleksey")
                     {
-                        case "3630":
-                            checkBox3630.Checked = true;
-                            break;
-                        case "3631":
-                            checkBox3631.Checked = true;
-                            break;
-                        case "3632":
-                            checkBox3632.Checked = true;
-                            break;
-                        case "3633":
-                            checkBox3633.Checked = true;
-                            break;
-                        default:
-                            break;
+                        MenuItemPerformer.Enabled = true;
+                        RefreshBasket.Enabled = true;
                     }
 
-                    conn.Disconnect();
                     this.Show();
                 }
                 else
@@ -128,7 +88,7 @@ namespace MainWindow
                 
 
             }
-            catch
+            catch(Exception e)
             {
                 MessageBox.Show("Возникло исключение", "Ошибка");
 
@@ -140,6 +100,11 @@ namespace MainWindow
             
 
             //Нужно считать из файла пути к шаблону и к СЗ
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
 
         private void search_button_Click(object sender, EventArgs e)
@@ -157,14 +122,14 @@ namespace MainWindow
 
                     if (radioButtonDestination.Checked)
                     {
-                        sqlQ = " WHERE destination IN (SELECT id_destination FROM destination WHERE dest_surname LIKE \"%" +
-                               textBoxMainSerch.Text + "%\")";
+                        sqlQ = " WHERE destination = (SELECT id_destination FROM destination WHERE dest_surname = \"" +
+                               textBoxMainSerch.Text + "\")";
                     }
 
                     if (radioButtonPerformer.Checked)
                     {
-                        sqlQ = " WHERE user = (SELECT id_user FROM performer WHERE surname LIKE \"%" +
-                               textBoxMainSerch.Text + "%\")";
+                        sqlQ = " WHERE user = (SELECT id_user FROM performer WHERE surname = \"" +
+                               textBoxMainSerch.Text + "\")";
                     }
 
                     if (radioButtonDocName.Checked)
@@ -181,8 +146,7 @@ namespace MainWindow
                     {
                         sqlQ = " WHERE summary LIKE \"%" + textBoxMainSerch.Text + "%\"";
                     }
-
-                    sqlQ += department;
+                    
 
                     sqlQ += " ORDER BY count_sn DESC;";
 
@@ -221,11 +185,7 @@ namespace MainWindow
                     if (pathPattern != null)
                     {
                         FormForCreateDoc createSN = new FormForCreateDoc(pathPattern);
-                        if(createSN.DialogResult != DialogResult.Cancel)
-                        {
-                            createSN.ShowDialog();
-                        }
-                        
+                        createSN.ShowDialog();
                     }                    
                 }
                 else
@@ -238,9 +198,11 @@ namespace MainWindow
                 MessageBox.Show("Необходимо задать настройки. Для этого откройти Сервис -> Настройки", "Ошибка создания документа");
             }
 
+            conn = new WorkMySQL(settingFile);
+
             if (conn.Connect())
             {
-                listDoc = conn.LastNNumberSN(55, department);
+                listDoc = conn.LastNNumberSN(10);
                 AddListBox();                
                 conn.Disconnect();
             }
@@ -258,7 +220,6 @@ namespace MainWindow
         {
             FormForSerch SerchDoc = new FormForSerch();
             SerchDoc.Owner = this;
-            SerchDoc.department = department;
             SerchDoc.ShowDialog(); //Данный оператор нельзя переносить внутрь функции. Т.к. оператор SerchDoc.Owner = this; в таком случае не выполниться
         }
 
@@ -279,8 +240,7 @@ namespace MainWindow
 
         //двойной клик по листбокс
         private void listBoxSN_DoubleClick(object sender, EventArgs e)
-        {
-            
+        {            
             try
             {
                 int i = listBoxSN.SelectedIndex;
@@ -397,8 +357,7 @@ namespace MainWindow
                 {
 
                     if (conn.Connect())
-                    {                        
-
+                    {
                         DialogResult result = MessageBox.Show("Удалить документ?", "Удаление документа", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
                         if (result == DialogResult.Yes)
@@ -412,7 +371,7 @@ namespace MainWindow
                                 Directory.Delete(pathDoc, true);
                             }
                             
-                            listDoc = conn.LastNNumberSN(55, department);
+                            listDoc = conn.LastNNumberSN(10);
                             AddListBox();
                         }
                                                 
@@ -444,15 +403,6 @@ namespace MainWindow
         private void StripMenuSelfAppointed_Click(object sender, EventArgs e)
         {
             AddDocWithNumber attach = new AddDocWithNumber();
-            if(attach.DialogResult != DialogResult.Cancel)
-                attach.ShowDialog();
-
-            if (conn.Connect())
-            {
-                listDoc = conn.LastNNumberSN(55, department);
-                AddListBox();
-                conn.Disconnect();
-            }
             //Вызываем форму задания самоназначенного номера
 
             //В форме проверям не занят ли данный номер
@@ -494,46 +444,39 @@ namespace MainWindow
         {
             try
             {
-                TreeNode node = treeViewAuxiliaryFiles.SelectedNode;                
+                TreeNode node = treeViewAuxiliaryFiles.SelectedNode;
 
                 if(node != null)
                 {
-                    if (treeViewAuxiliaryFiles.TopNode != node)
-                    {
-                        //Если папка, то добавляем
-                        string pathDirectory = node.Tag.ToString();
+                    //Если папка, то добавляем
+                    string pathDirectory = node.Tag.ToString();
 
-                        if (new CommonClass().IsDirectory(pathDirectory)) //возможно здесь нужно проверить ссылку на файл это или папка
+                    if (new CommonClass().IsDirectory(pathDirectory)) //возможно здесь нужно проверить ссылку на файл это или папка
+                    {                       
+                        OpenFileDialog openFileDialog = new OpenFileDialog();
+                        DialogResult result = openFileDialog.ShowDialog();
+
+                        if (result == DialogResult.OK)
                         {
-                            OpenFileDialog openFileDialog = new OpenFileDialog();
-                            DialogResult result = openFileDialog.ShowDialog();
+                            //Получаем имя файла                       
+                            string fileName = Path.GetFileName(openFileDialog.FileName);
 
-                            if (result == DialogResult.OK)
-                            {
-                                //Получаем имя файла                       
-                                string fileName = Path.GetFileName(openFileDialog.FileName);
+                            //Конечный путь файла с именем
+                            string pathFile = Path.Combine(pathDirectory, fileName);
 
-                                //Конечный путь файла с именем
-                                string pathFile = Path.Combine(pathDirectory, fileName);
+                            //Копируем (из, в)
+                            File.Copy(openFileDialog.FileName, pathFile);
 
-                                //Копируем (из, в)
-                                File.Copy(openFileDialog.FileName, pathFile);
+                            //обновляем дерево
+                            TreeNode list = new TreeNode();
+                            list.Text = fileName;
+                            list.Tag = pathFile;
+                            list.ImageIndex = 1;
+                            list.SelectedImageIndex = 1;
 
-                                //обновляем дерево
-                                TreeNode list = new TreeNode();
-                                list.Text = fileName;
-                                list.Tag = pathFile;
-                                list.ImageIndex = 1;
-                                list.SelectedImageIndex = 1;
+                            node.Nodes.Add(list);
 
-                                node.Nodes.Add(list);
-
-                            }
                         }
-                    }
-                    else
-                    {
-                        MessageBox.Show("В данной директории можно только создавать папки");
                     }
                 }                
 
@@ -840,7 +783,6 @@ namespace MainWindow
                                         //Копируем файл и переименовываем
                                         File.Copy(textBoxBaseFile.Text, fullNewFileName);
 
-
                                         //Теперь откроем его в ворде и сохраним его в pdf
                                         MessageFilter.Register();
 
@@ -885,12 +827,12 @@ namespace MainWindow
                                 }
 
                             }
-                        }
+                        }                        
 
                         //Просто обновим данные в базе
                         conn.UpdateSN(doc);
                         RefreshFild();
-                        listDoc = conn.LastNNumberSN(55, department);
+                        listDoc = conn.LastNNumberSN(10);
                         AddListBox();
 
 
@@ -923,7 +865,7 @@ namespace MainWindow
 
         //функция заполняет поля информацией
         private void FillFieldInformation(int index)
-        {           
+        {
             comboBoxPerform.Text = "";
             comboBoxDest.Text = "";            
             try
@@ -946,34 +888,6 @@ namespace MainWindow
 
                     dateicker.Value = listDoc[index].date;
 
-                    Performer per = listDoc[index].performer;
-                    if (conn.GetPerformer().IsUserRoot || per.PCName == Environment.UserName) //Если пользователь обладает супер правами либо он создал данный документ
-                    {
-                        browse.Enabled = true;
-                        //не только чтение
-                        textBoxSummary.ReadOnly = false;
-                        comboBoxDest.Enabled = true;
-                        comboBoxPerform.Enabled = true;
-                        //не только чтение
-                        textBoxNameDoc.ReadOnly = false;
-
-                        //можно редактировать
-                        ToolStripMenuItemEdit.Enabled = true;
-                    }
-                    else
-                    {
-                        //нельзя редактировать
-                        ToolStripMenuItemEdit.Enabled = false;
-
-                        browse.Enabled = false;
-                        //только чтение
-                        textBoxSummary.ReadOnly = true;
-                        comboBoxDest.Enabled = false;                        
-                        comboBoxPerform.Enabled = false;
-                        //только чтение
-                        textBoxNameDoc.ReadOnly = true;
-                    }
-
                     conn.Disconnect();
 
                     GetAuxiliaryFiles(index);
@@ -990,7 +904,7 @@ namespace MainWindow
             {
                 MessageBox.Show("Исключение");
             }
-            //Нужен в конце. Иначе не работает
+
             SaveDocInfo.Enabled = false;
         }
 
@@ -1064,6 +978,17 @@ namespace MainWindow
             }
         }
 
+        //Очистить корзину номеров
+        private void RefreshBasket_Click(object sender, EventArgs e)
+        {
+            //Очистить корзину номеров
+            if (conn.Connect())
+            {
+                //вызываем функцию чистки корзины номеров
+                conn.RefreshBasket();
+                conn.Disconnect();
+            }
+        }
 
         //обновляем данные
         private void RefreshData_Click(object sender, EventArgs e)
@@ -1071,7 +996,7 @@ namespace MainWindow
             if (conn.Connect())
             {
                 RefreshFild();
-                listDoc = conn.LastNNumberSN(55, department);
+                listDoc = conn.LastNNumberSN(10);
                 AddListBox(); 
                 conn.Disconnect();
             }
@@ -1102,17 +1027,14 @@ namespace MainWindow
             textBoxBaseFile.Clear();
         }
 
-        //Сформировать список занятых номеров в ворде
         private void ListDocToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ListDoc listDoc = new ListDoc();
-            listDoc.department = department;
             listDoc.ShowDialog();
         }
 
-        //Заменить основной файл
         private void browse_Click(object sender, EventArgs e)
-        {                        
+        {
             //здесь возможно нужно поставить фильтр только на doc/docx файлы
 
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -1149,50 +1071,6 @@ namespace MainWindow
         private void textBoxNameDoc_TextChanged(object sender, EventArgs e)
         {
             SaveDocInfo.Enabled = true;
-        }
-
-        //Запрещаем удалять корневую папку
-        private void treeViewAuxiliaryFiles_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            TreeNode node = treeViewAuxiliaryFiles.SelectedNode;
-
-            if (treeViewAuxiliaryFiles.TopNode == node)
-            {
-                StripMenuAuxiliaryFiles.Enabled = false;
-                DeleteToolStripMenuItem.Enabled = false;
-            }
-            else
-            {
-                StripMenuAuxiliaryFiles.Enabled = true;
-                DeleteToolStripMenuItem.Enabled = true;
-            }
-        }
-
-        private void checkBoxDepartment_CheckedChanged(object sender, EventArgs e)
-        {
-
-            department = " AND department IN ('0'";
-
-            if (checkBox3630.Checked)
-            {
-                department += ", '3630'";
-            }
-            if (checkBox3631.Checked)
-            {
-                department += ", '3631'";
-            }
-            if (checkBox3632.Checked)
-            {
-                department += ", '3632'";
-            }
-            if (checkBox3633.Checked)
-            {
-                department += ", '3633'";
-            }
-
-            department += ")";
-
-            RefreshData_Click(sender, e);
         }
     }
 }

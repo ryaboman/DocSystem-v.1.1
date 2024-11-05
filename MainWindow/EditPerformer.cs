@@ -29,9 +29,6 @@ namespace MainWindow
                 {
                     performList = conn.GetAllPerformeres(comboBoxPerform);
                     conn.Disconnect();
-
-                    comboBoxPerform.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxPerform.AutoCompleteSource = AutoCompleteSource.ListItems;
                 }
                 else
                 {

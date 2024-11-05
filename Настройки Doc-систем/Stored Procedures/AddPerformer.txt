@@ -1,6 +1,0 @@
-CREATE DEFINER=`root`@`localhost` PROCEDURE `AddPerformer`(PCName VARCHAR(45), surnameIN VARCHAR(45), nameIN VARCHAR(45), patronymicIN VARCHAR(45), departmentIN VARCHAR(45), postIN VARCHAR(100), phoneIN VARCHAR(45))
-    SQL SECURITY INVOKER
-BEGIN
-	INSERT INTO performer (user_name, surname, name, patronymic, department, post, number_phone)
-	VALUES (PCName, surnameIN, nameIN, patronymicIN, departmentIN, postIN, phoneIN); 
-END

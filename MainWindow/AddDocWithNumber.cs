@@ -40,28 +40,18 @@ namespace MainWindow
                     performList = conn.GetAllPerformeres(comboBoxPerformer);
                     destList = conn.GetAllDestination(comboBoxDestin);
 
-                    Performer currentUser = conn.GetPerformer();
-
-                    comboBoxPerformer.SelectedIndex = comboBoxPerformer.FindString(currentUser.Initials());
-
-                    comboBoxPerformer.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxPerformer.AutoCompleteSource = AutoCompleteSource.ListItems;
-
-                    comboBoxDestin.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxDestin.AutoCompleteSource = AutoCompleteSource.ListItems;
-
                     conn.Disconnect();
                 }
                 else
                 {
                     MessageBox.Show("Не получается подключиться к серверу");
-                    this.DialogResult = DialogResult.Cancel;
                     return;
-                }                
+                }
+                this.ShowDialog();
             }
             catch
             {
-                this.DialogResult = DialogResult.Cancel;
+
             }
         }
 
@@ -115,30 +105,7 @@ namespace MainWindow
             {
                 if (conn.Connect())
                 {
-                    Destination dest = null;
-
-                    if (comboBoxDestin.SelectedIndex >= 0)
-                    {
-                        dest = destList[comboBoxDestin.SelectedIndex];
-                    }
-                    else
-                    {
-                        dest = new Destination();
-                    }
-
-                    Performer perform = null;
-
-                    if (comboBoxPerformer.SelectedIndex >= 0)
-                    {
-                        perform = performList[comboBoxPerformer.SelectedIndex];
-                    }
-                    else
-                    {
-                        perform = new Performer();
-                    }
-
-
-                    string id_doc = conn.SetNumberDoc(numberDoc.Text, perform);
+                    string id_doc = conn.SetNumberDoc(numberDoc.Text);
                     if (id_doc != null)
                     {
 
@@ -146,9 +113,31 @@ namespace MainWindow
                         string path = conn.GetVariable("pathHead");  // данную директорию нужно проверять. может она не существует в текущий момент
 
                         if (Directory.Exists(path))
-                        {                            
+                        {
 
-                            string markDoc = "195-95-30-" + perform.department + "-" + numberDoc.Text;
+                            Destination dest = null;
+
+                            if (comboBoxDestin.SelectedIndex >= 0)
+                            {
+                                dest = destList[comboBoxDestin.SelectedIndex];
+                            }
+                            else
+                            {
+                                dest = new Destination();
+                            }
+
+                            Performer perform = null;
+
+                            if (comboBoxPerformer.SelectedIndex >= 0)
+                            {
+                                perform = performList[comboBoxPerformer.SelectedIndex];
+                            }
+                            else
+                            {
+                                perform = new Performer();
+                            }
+
+                            string markDoc = "195-95-30-3631-" + numberDoc.Text;
 
                             //Нужно копировать номер СЗ в буфер обмена
                             Clipboard.SetDataObject(markDoc, true);
@@ -215,38 +204,38 @@ namespace MainWindow
             {
                 if (conn.Connect())
                 {
-                    Destination dest = null;
-
-                    if (comboBoxDestin.SelectedIndex >= 0)
-                    {
-                        dest = destList[comboBoxDestin.SelectedIndex];
-                    }
-                    else
-                    {
-                        dest = new Destination();
-                    }
-
-                    Performer perform = null;
-
-                    if (comboBoxPerformer.SelectedIndex >= 0)
-                    {
-                        perform = performList[comboBoxPerformer.SelectedIndex];
-                    }
-                    else
-                    {
-                        perform = new Performer();
-                    }
-
-                    string id_doc = conn.SetNumberDoc(numberDoc.Text, perform);
+                    string id_doc = conn.SetNumberDoc(numberDoc.Text);
                     if (id_doc != null)
                     {
                         //Ссылка на папку где будут храниться документы
                         string path = conn.GetVariable("pathHead");  // данную директорию нужно проверять. может она не существует в текущий момент
 
                         if (Directory.Exists(path))
-                        {                            
+                        {
 
-                            string markDoc = "195-95-30-" + perform.department + "-" + numberDoc.Text;
+                            Destination dest = null;
+
+                            if (comboBoxDestin.SelectedIndex >= 0)
+                            {
+                                dest = destList[comboBoxDestin.SelectedIndex];
+                            }
+                            else
+                            {
+                                dest = new Destination();
+                            }
+
+                            Performer perform = null;
+
+                            if (comboBoxPerformer.SelectedIndex >= 0)
+                            {
+                                perform = performList[comboBoxPerformer.SelectedIndex];
+                            }
+                            else
+                            {
+                                perform = new Performer();
+                            }
+
+                            string markDoc = "195-95-30-3631-" + numberDoc.Text;
 
                             //Нужно копировать номер СЗ в буфер обмена
                             Clipboard.SetDataObject(markDoc, true);
@@ -257,7 +246,6 @@ namespace MainWindow
                             //Наименование файла служебной записки
                             string nameFile = markDoc + " _ " + textBoxNameDoc.Text + " (исп. " + perform.Initials() + ", адр. " + dest.Initials() + ")";
 
-                            doc.id = id_doc;
                             //Относительный путь к служебной записки
                             doc.pathRelative = markDoc + @"\" + nameFile;
                             doc.name = textBoxNameDoc.Text;
@@ -279,20 +267,13 @@ namespace MainWindow
                                     CreateDocFromPattern selector = new CreateDocFromPattern(pathToPatternes);
                                     selector.ShowDialog();
 
-                                    if(selector.DialogResult != DialogResult.Cancel)
-                                    {
-                                        string pathPattern = selector.pathPattern;
+                                    string pathPattern = selector.pathPattern;
 
-                                        //если ссылка задана, то создаем файл
-                                        if (pathPattern != null)
-                                        {
-                                            new CommonClass().CreateDoc(pathPattern, doc);
-                                        }
-                                    }
-                                    else
+                                    //если ссылка задана, то создаем файл
+                                    if (pathPattern != null)
                                     {
-                                        conn.DeleteSN(doc);
-                                    }                                    
+                                        new CommonClass().CreateDoc(pathPattern, doc);
+                                    }
                                 }
                             }
 
@@ -319,14 +300,12 @@ namespace MainWindow
         {
             if (rdBtnAttached.Checked)
             {
-                comboBoxPerformer.Enabled = true;
                 AddBaseFile.Enabled = true;
                 textBoxBaseFile.Enabled = true;
                 lableFileDoc.Enabled = true;
             }
             else
             {
-                comboBoxPerformer.Enabled = false;
                 AddBaseFile.Enabled = false;
                 textBoxBaseFile.Enabled = false;
                 lableFileDoc.Enabled = false;

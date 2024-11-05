@@ -29,9 +29,6 @@ namespace MainWindow
                 {
                     destList = conn.GetAllDestination(comboBoxDest);
                     conn.Disconnect();
-
-                    comboBoxDest.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                    comboBoxDest.AutoCompleteSource = AutoCompleteSource.ListItems;
                 }
                 else
                 {

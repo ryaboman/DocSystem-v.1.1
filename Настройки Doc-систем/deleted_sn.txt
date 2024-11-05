@@ -1,6 +1,0 @@
-CREATE TABLE `deleted_sn` (
-  `id_deleted_sn` int(11) NOT NULL AUTO_INCREMENT,
-  `count_sn` int(11) NOT NULL,
-  PRIMARY KEY (`id_deleted_sn`),
-  UNIQUE KEY `count_sn_UNIQUE` (`count_sn`)
-) ENGINE=InnoDB DEFAULT CHARSET=cp1251 COMMENT='Удаленные служебные записки'

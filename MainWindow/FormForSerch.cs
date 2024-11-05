@@ -12,9 +12,7 @@ using System.IO;
 namespace MainWindow
 {
     public partial class FormForSerch : Form
-    {
-        public string department = null;
-
+    {  
         public FormForSerch()
         {
             InitializeComponent();            
@@ -92,8 +90,8 @@ namespace MainWindow
                 if (checkDestination.CheckState == CheckState.Checked)
                 {
                     //Для адресата нужно делать возможно подзапрос!
-                    sqlDestination = " AND destination IN (SELECT id_destination FROM destination WHERE dest_surname LIKE \"%" +
-                                       textDestination.Text + "%\")";
+                    sqlDestination = " AND destination = (SELECT id_destination FROM destination WHERE dest_surname = \"" +
+                                       textDestination.Text + "\")";
 
                     sqlQ += sqlDestination; //запрос на выбор по адресату
                 }
@@ -101,8 +99,8 @@ namespace MainWindow
                 //Запрос выборки по исполнителю
                 if (checkPerformer.CheckState == CheckState.Checked)
                 {
-                    sqlPerformer = " AND user = (SELECT id_user FROM performer WHERE surname LIKE \"%" +
-                                       textPerformer.Text + "%\")";
+                    sqlPerformer = " AND user = (SELECT id_user FROM performer WHERE surname = \"" +
+                                       textPerformer.Text + "\")";
 
                     sqlQ += sqlPerformer; //запрос на выбор по исполнителю
                 }
@@ -138,12 +136,11 @@ namespace MainWindow
                     sqlDate = " AND date >= \"" + DateFrom + "\" AND date <= \"" + DateBy + "\"";
 
                     sqlQ += sqlDate;
-                }                
+                }
+
+                sqlQ += " ORDER BY count_sn DESC;";
+
             }
-
-            sqlQ += department;
-            sqlQ += " ORDER BY count_sn DESC;";
-
             return sqlQ;
         }
 
